@@ -1,11 +1,12 @@
 """
 Generate Identifier Data
 	identification_number - 8 or 9 digit random number
-    InactivatedDate - random date (last two years)
+    InactivatedDate - 10% random date (last two years) - 90% empty
     StartDate - random date (between four to two years ago)
     LastUpdatedDate - higher of inactivated or start date
     LastUpdatedUser - hardcoded "dummy_user"
-    PartyType - hardcoded "TestSet"	
+    PartyType - 10% O and 90% P
+    record_source - hardcoded "TestSet"	
 """
 import csv
 import random
@@ -16,6 +17,9 @@ from datetime import datetime, timedelta
 inactivated_date_range = {"start": datetime.today() - timedelta(weeks=2*52), "end": datetime.today()}
 inactivated_date_probability = 0.1
 
+# Probability of generating an O instead of a P
+party_type_probability = 0.1
+
 # StartDate characteristics (100% - between four to two years ago)
 start_date_range = {"start": datetime.today() - timedelta(weeks=4*52), "end": datetime.today() - timedelta(weeks=2*52)}
 
@@ -24,7 +28,7 @@ def main(num_records: int):
     with open('out.csv', 'w+', newline='', encoding='utf-8') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter=';', quoting=csv.QUOTE_ALL)
         # Write the header
-        csv_writer.writerow(["identification_number", "InactivatedDate", "StartDate", "LastUpdatedDate", "LastUpdatedUser", "PartyType"])
+        csv_writer.writerow(["identification_number", "InactivatedDate", "StartDate", "LastUpdatedDate", "LastUpdatedUser", "PartyType", "record_source"])
         for i in range(num_records):
             identification_number = random.randrange(10000000, 999999999)
 
@@ -39,10 +43,11 @@ def main(num_records: int):
 
             last_updated_date = start_date if (inactivated_date == "") else inactivated_date
             last_updated_user = "dummy_user"
-            party_type = "TestSet"
+            party_type = "O" if (random.random() <= party_type_probability) else "P"
+            recourd_source = "TestSet"
             
             # Write the row
-            csv_writer.writerow([identification_number, inactivated_date, start_date, last_updated_date, last_updated_user, party_type])
+            csv_writer.writerow([identification_number, inactivated_date, start_date, last_updated_date, last_updated_user, party_type, recourd_source])
 
             # Report progress
             if (i % 1000000 == 0):
